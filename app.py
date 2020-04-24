@@ -57,7 +57,7 @@ def index():
 def readConfig():
     configDict: dict = {}
     try:
-        processConfigpath = os.path.dirname(__file__) + "/config.json"
+        processConfigpath = "config.json"
         with open(processConfigpath, "r", encoding="utf-8") as jsonString:
             configDict['configData'] = json.load(jsonString)
     except Exception as e:
