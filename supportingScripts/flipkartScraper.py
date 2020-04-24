@@ -21,6 +21,7 @@ class FlipkartScraper():
             for product in bigboxes:
                 self.processTheProduct(product)
                 print("Product Reviews Successfully Scrape, now will go for next product on same page")
+                break
         except Exception as e:
             print("Exception Occurred Inside scrapeTheScreen")
             print(str(e))
