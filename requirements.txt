@@ -26,3 +26,4 @@ pymongo==3.10.1
 dnspython==1.16.0
 dnspython3==1.15.0
 beautifulsoup4==4.9.0
+requests==2.23.0
