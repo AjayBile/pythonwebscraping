@@ -32,7 +32,7 @@ class FlipkartScraper():
 
             print("BOT will process the product here")
 
-            productLink = self.configDictInAction['product']['flipkart_url'] + singleProduct.div.div.div.a['href']
+            productLink = self.configDictInAction['baseurl'] + singleProduct.div.div.div.a['href']
             print("From here BOT will redirect to the review page")
             print(productLink)
 
@@ -50,7 +50,7 @@ class FlipkartScraper():
                 print("BOT has found multiple reviews, so now lets scrape each page one by one")
                 """it means reviews are more"""
                 print(sagle_reviews[0].get_text())
-                all_reviews_url = self.configDictInAction['product']['flipkart_url'] + str(sagle_reviews[0].find_parent().get('href'))
+                all_reviews_url = self.configDictInAction['baseurl'] + str(sagle_reviews[0].find_parent().get('href'))
                 print(all_reviews_url)
 
                 print("Now BOT will push all reviews in DB for all the pages of this particular Product")
@@ -132,7 +132,7 @@ class FlipkartScraper():
                 # we will scrape only first 20 pages
                 # in order to scrape all the pages will use this condition - url_to_append != None
 
-                flipkart_url = self.configDictInAction['product']['flipkart_url'] + str(url_to_append)
+                flipkart_url = self.configDictInAction['baseurl'] + str(url_to_append)
                 req_data = requests.get(flipkart_url)
                 flipkart_html = BeautifulSoup(req_data.content, 'html.parser')
 
@@ -150,8 +150,8 @@ class FlipkartScraper():
 
     def insertInMongo(self, mongoDict):
 
-        conn = pymongo.MongoClient(self.configDictInAction['databse']['prod_db_url'])
-        db = conn[self.configDictInAction['databse']['prod_db_name']]
+        conn = pymongo.MongoClient(self.configDictInAction['mongourl'])
+        db = conn[self.configDictInAction['mongodbname']]
         coll = db[str(self.product_category).lower()]
         x = coll.insert_one(mongoDict)
         print("Documet insertion id "+str(x.inserted_id))

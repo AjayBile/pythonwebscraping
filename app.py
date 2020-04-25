@@ -20,13 +20,28 @@ def index():
 
         try:
 
-            # Reading the configuration file
-            configdict:dict = readConfig()
-            print(configdict['configData'])
-            dictToUseByProcess = configdict['configData']
+            # Default mongoDB url is of Dev environment
+            mongo_url = "mongodb://localhost:27017/"
+            mongo_db_name = "testDB"
+            is_prod = os.environ.get('IS_HEROKU', None)
+            if is_prod:
+                mongo_url: str = os.environ.get('MONGODB_URL', None)
+                mongo_url = mongo_url+"?retryWrites=true&w=majority"
+                mongo_db_name = "reviewsDB"
 
-            dbConn = pymongo.MongoClient(dictToUseByProcess['databse']['prod_db_url'])  # opening a connection to Mongo
-            db = dbConn[dictToUseByProcess['databse']['prod_db_name']]  # connecting to the database called crawlerDB
+            # set the base url
+            base_url = "https://www.flipkart.com"
+
+            configdict = {}
+
+            configdict['mongourl'] = mongo_url
+            configdict['mongodbname'] = mongo_db_name
+            configdict['baseurl'] = base_url
+
+            print(configdict)
+
+            dbConn = pymongo.MongoClient(mongo_url)  # opening a connection to Mongo
+            db = dbConn[mongo_db_name]  # connecting to the database called crawlerDB
             reviews = db[searchString].find({})  # searching the collection with the name same as the keyword
             if reviews.count()<=0:
                 print("Keyword Not Found in Category")
@@ -44,7 +59,7 @@ def index():
                 return render_template('results.html', reviews=reviews)
             else:
                 print("No previous data has present, hence scraping the data")
-                flipkart = FlipkartScraper(searchString, dictToUseByProcess)
+                flipkart = FlipkartScraper(searchString, configdict)
                 flipkart.repeatTillLastPage()
             reviews = db[searchString].find({})
 
@@ -54,21 +69,10 @@ def index():
     else:
         return render_template('index.html')
 
-def readConfig():
-    configDict: dict = {}
-    try:
-        processConfigpath = "config.json"
-        with open(processConfigpath, "r", encoding="utf-8") as jsonString:
-            configDict['configData'] = json.load(jsonString)
-    except Exception as e:
-        print("Exception Occurred Inside readConfig")
-        print(str(e))
-    return configDict
-
 if __name__ == "__main__":
     port = int(os.getenv('PORT', 5000))
     print("Starting app on port %d" % port)
-    app.run(debug=False, port=port, host='0.0.0.0')
+    app.run(debug=False, port=port, host='127.0.0.1')
 
 
 
